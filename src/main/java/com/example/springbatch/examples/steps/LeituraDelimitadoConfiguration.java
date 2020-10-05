@@ -1,0 +1,26 @@
+package com.example.springbatch.examples.steps;
+
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class LeituraDelimitadoConfiguration {
+
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Bean
+    Step leituraDelimitadoStep(ItemReader leituraArquivoDelimitado,
+                               ItemWriter leituraArquivoDelimitadoWriter) {
+        return stepBuilderFactory.get("leituraDelimitadoStep")
+                .chunk(1)
+                .reader(leituraArquivoDelimitado)
+                .writer(leituraArquivoDelimitadoWriter)
+                .build();
+    }
+}

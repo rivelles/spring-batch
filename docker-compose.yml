@@ -1,0 +1,96 @@
+version: '3'
+
+services:
+  mysqlsrv:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: "1234"
+      MYSQL_DATABASE: "springbatch"
+    ports:
+      - "3306:3306"
+    volumes:
+      - /home/lucas/volumes/mysql:/var/lib/mysql
+    networks:
+      - mysql-compose-network
+
+  mongo:
+    image: mongo:3
+    volumes:
+      - ./graylog/mongo_data:/data/db
+    networks:
+      - graylog-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.2
+    volumes:
+      - ./es_data:/usr/share/elasticsearch/data
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=localhost
+      - network.host=0.0.0.0
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    networks:
+      - graylog-network
+
+  graylog:
+    image: graylog/graylog:3.1.0
+    volumes:
+      - ./graylog_journal:/usr/share/graylog/data/journal
+    environment:
+      - TZ=America/Sao_Paulo
+      - GRAYLOG_ROOT_TIMEZONE=America/Sao_Paulo
+      - GRAYLOG_PASSWORD_SECRET=somepasswordpepper
+      # Password: admin
+      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/
+      - GRAYLOG_ELASTICSEARCH_INDEX_PREFIX=graylog
+    depends_on:
+      - elasticsearch
+      - mongo
+    networks:
+      - graylog-network
+    ports:
+      # GELF UDP LOG
+      - 12201:12201/udp
+      # Graylog web interface and REST API
+      - 9000:9000
+
+  pushgateway:
+    image: prom/pushgateway:v1.0.1
+    volumes:
+      - ./pushgateway_data:/data
+    command:
+      - --persistence.file=/data/pushgateway.data
+      - --persistence.interval=1h
+    expose:
+      - 9091
+    ports:
+      - "9091:9091"
+    networks:
+      - prometheus-grafana-network
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    networks:
+      - prometheus-grafana-network
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+    ports:
+      - 3000:3000
+    networks:
+      - prometheus-grafana-network
+
+networks:
+  mysql-compose-network:
+    driver: bridge
+  graylog-network:
+    driver: bridge
+  prometheus-grafana-network:
+    driver: bridge
