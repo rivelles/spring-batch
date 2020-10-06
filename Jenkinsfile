@@ -1,17 +1,11 @@
 pipeline {
-    agent {
-        docker
-    }
+    agent { docker { image 'maven:3.3.3' } }
     stages {
-        stage('Test') {
+        stage('build') {
             steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
+                sh 'mvn compile'
             }
         }
     }
 }
+
