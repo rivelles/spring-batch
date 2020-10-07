@@ -1,4 +1,4 @@
-package com.example.springbatch.config;
+package com.example.springbatch.projeto.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -13,13 +13,13 @@ public class DataSourceConfig {
 
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource")
-    @Primary
     public DataSource springDataSource() {
         return DataSourceBuilder.create().build();
     }
 
-    @Bean
+    @Bean(name = "appDataSource")
     @ConfigurationProperties(prefix = "app.datasource")
+    @Primary
     public DataSource appDataSource() {
         return DataSourceBuilder.create().build();
     }

@@ -1,19 +1,3 @@
-CREATE TABLE `cartao_credito` (
-  `numero_cartao_credito` int NOT NULL,
-  `cliente` int NOT NULL,
-  PRIMARY KEY (`numero_cartao_credito`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-CREATE TABLE `transacao` (
-  `id` int NOT NULL,
-  `numero_cartao_credito` int NOT NULL,
-  `descricao` varchar(255) NOT NULL,
-  `valor` float NOT NULL,
-  `data` date NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-
 INSERT INTO `cartao_credito` (`numero_cartao_credito`, `cliente`) VALUES (1500573, 1);
 INSERT INTO `cartao_credito` (`numero_cartao_credito`, `cliente`) VALUES (2811036, 2);
 INSERT INTO `cartao_credito` (`numero_cartao_credito`, `cliente`) VALUES (5495815, 3);
