@@ -41,6 +41,7 @@ pipeline {
             }
             steps {
                 echo 'Will build image'
+                sh 'mvn spring-boot:build-image'
             }
         }
     }
