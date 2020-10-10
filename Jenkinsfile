@@ -6,9 +6,41 @@ pipeline {
         }
     }
     stages {
-        stage('build') {
+        stage('test') {
             steps {
                 sh 'mvn clean test'
+            }
+        }
+
+        stage('approve') {
+            steps {
+                script {
+                    env.APPROVED_DEPLOY = input message: 'User input required',
+                    parameters: [choice(name: 'Deploy?', choices: 'no\nyes', description: 'Choose "yes" if you want to deploy this build')]
+                }
+            }
+        }
+
+        stage('abort deploy') {
+            when{
+                environment name:'APPROVED_DEPLOY',value:'no'
+            }
+            steps {
+                echo 'Aborting'
+                post {
+                    always {
+                        cleanWS()
+                    }
+                }
+            }
+        }
+
+        stage('build image') {
+            when {
+                environment name:'APPROVED_DEPLOY', value: 'yes'
+            }
+            steps {
+                echo 'Will build image'
             }
         }
     }
